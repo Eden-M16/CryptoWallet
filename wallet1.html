@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Lumina Wallet | Crypto Vault</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #f8fafc 0%, #eef2f8 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        /* bright glassmorphic container */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(100, 120, 200, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(115deg, #1a2a6c, #b21f1f, #fdbb4d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+        }
+
+        h1:before {
+            content: "✨";
+            background: none;
+            -webkit-background-clip: unset;
+            color: #f5b042;
+            font-size: 2rem;
+        }
+
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .connect-btn {
+            background: linear-gradient(105deg, #2463eb, #1a4fc2);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 40px;
+            width: auto;
+            box-shadow: 0 4px 10px rgba(36, 99, 235, 0.25);
+            transition: all 0.2s;
+            color: white;
+            cursor: pointer;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(36, 99, 235, 0.35);
+            background: linear-gradient(105deg, #3675f0, #2260df);
+        }
+
+        .account-chip {
+            background: #f0f4fe;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-family: monospace;
+            font-weight: 500;
+            color: #1e40af;
+            border: 1px solid #cddcff;
+            backdrop-filter: blur(0);
+        }
+
+        .contract-badge {
+            background: #eef3ff;
+            border-radius: 20px;
+            padding: 10px 16px;
+            font-size: 0.75rem;
+            text-align: center;
+            font-family: monospace;
+            word-break: break-all;
+            border-left: 4px solid #3b82f6;
+            color: #1f2b48;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+
+        .balance-card {
+            background: linear-gradient(125deg, #ffffff, #f9fcff);
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.2rem 0 1.5rem 0;
+            border: 1px solid #e2edff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .balance-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: #5b6e8c;
+        }
+
+        .balance-amount {
+            font-size: 3.4rem;
+            font-weight: 800;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #1f3a7a, #2d5f9e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .refresh-row {
+            display: flex;
+            justify-content: center;
+        }
+
+        .refresh-btn {
+            background: #eef2fa;
+            width: auto;
+            padding: 8px 26px;
+            font-size: 0.8rem;
+            border-radius: 40px;
+            color: #2c3e66;
+            font-weight: 500;
+            border: 1px solid #d4e0f0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 1.8rem 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #f5b042;
+            padding-left: 14px;
+            color: #1f2f54;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px 18px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        input {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+
+        button {
+            background: #eef2f6;
+            color: #1e2a44;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(105deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(105deg, #0ea271, #047857);
+            transform: scale(0.98);
+        }
+
+        .btn-warning {
+            background: linear-gradient(105deg, #f97316, #ea580c);
+            color: white;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(105deg, #fd7e2e, #dc4600);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #cbd5e1;
+            color: #2c3e66;
+        }
+
+        .btn-outline:hover {
+            background: #f8fafc;
+            border-color: #3b82f6;
+        }
+
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 60px;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .connected {
+            background: #e0f2e9;
+            color: #0b5e42;
+            border-left: 4px solid #10b981;
+        }
+
+        .disconnected {
+            background: #ffe8e5;
+            color: #b91c1c;
+            border-left: 4px solid #f97316;
+        }
+
+        .flex-btns {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .gas-note {
+            font-size: 0.7rem;
+            text-align: right;
+            color: #6c7a91;
+            margin-top: 4px;
+        }
+
+        .owner-tag {
+            background: #fef3c7;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #b45309;
+            display: inline-block;
+        }
+
+        @media (max-width: 550px) {
+            .container {
+                padding: 1.3rem;
+            }
+            .balance-amount {
+                font-size: 2.2rem;
+            }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 0.6s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        a {
+            color: #2463eb;
+            text-decoration: none;
+        }
+
+        .network-chip {
+            background: #eef2ff;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Lumina Wallet ✨</h1>
+
+    <div class="wallet-header">
+        <button id="connectBtn" class="connect-btn" onclick="connectWallet()">🔌 Connect MetaMask</button>
+        <div id="accountInfo" class="account-chip">⚡ Not connected</div>
+    </div>
+
+    <div class="contract-badge">
+        📍 <strong>Smart Contract</strong> · <span id="shortContractAddr">0xdA7b...394C</span>
+        <span style="margin-left: 8px; background:#e9f0ff; padding:2px 10px; border-radius:20px;">✨ sendMoney: onlyOwner</span>
+    </div>
+
+    <div class="balance-card">
+        <div class="balance-label">💰 VAULT BALANCE</div>
+        <div class="balance-amount" id="balance">0.00 ETH</div>
+        <div class="refresh-row">
+            <button class="refresh-btn" onclick="getBalance(true)">🔄 Refresh Balance</button>
+        </div>
+    </div>
+
+    <!-- Deposit Section -->
+    <div class="section-title">
+        <span>📥</span> Deposit ETH
+    </div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <input type="number" id="depositAmount" placeholder="Amount in ETH" step="0.01" value="0.05">
+        <button id="depositBtn" class="btn-primary" onclick="deposit()">✨ Deposit Now</button>
+    </div>
+    <div class="gas-note">⚡ Direct transfer to contract — low gas</div>
+
+    <!-- Owner Transfer Section (only owner can send) -->
+    <div class="section-title">
+        <span>👑</span> Owner Transfer
+    </div>
+    <input type="text" id="sendTo" placeholder="Recipient address (0x...)" autocomplete="off">
+    <input type="number" id="sendAmount" placeholder="Amount in ETH" step="0.01" value="0.01">
+    <button id="sendBtn" class="btn-warning" onclick="sendMoney()">📤 Send ETH (Owner only)</button>
+    
+    <!-- Action row: Owner / Network / Copy -->
+    <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+        <button onclick="getOwner()" class="btn-outline" style="flex:1;">👑 View Owner</button>
+        <button onclick="displayNetwork()" class="btn-outline" style="flex:1;">🌐 Network Info</button>
+        <button onclick="copyContractAddress()" class="btn-outline" style="flex:1;">📋 Copy Contract</button>
+    </div>
+
+    <!-- Status + extra info row -->
+    <div id="status" class="status disconnected">💡 Connect wallet to start</div>
+    <div id="extraInfo" style="font-size: 0.7rem; text-align: center; margin-top: 12px; color: #4b5563;"></div>
+</div>
+
+<script>
+    let web3;
+    let contract;
+    let account;
+    let currentNetworkId = null;
+    
+    // CONTRACT DETAILS (from your original)
+    const contractAddress = "0xdA7bB92BfA9d2c1fBE7378F0bff3110776E3934C";
+    const contractABI = [
+        { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+        { "inputs": [], "name": "getBalance", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" },
+        { "inputs": [], "name": "owner", "outputs": [{ "internalType": "address", "name": "", "type": "address" }], "stateMutability": "view", "type": "function" },
+        { "inputs": [{ "internalType": "address payable", "name": "to", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }], "name": "sendMoney", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+        { "stateMutability": "payable", "type": "receive" }
+    ];
+    
+    // Helper for status messages with light theme
+    function setStatusMessage(msg, isError = false, isLoading = false) {
+        const statusDiv = document.getElementById('status');
+        if (isLoading) {
+            statusDiv.innerHTML = `<span class="spinner"></span> ${msg}`;
+        } else {
+            statusDiv.innerHTML = isError ? `⚠️ ${msg}` : `✓ ${msg}`;
+        }
+        if (isError) {
+            statusDiv.style.background = "#fff0ed";
+            statusDiv.style.borderLeftColor = "#f97316";
+            statusDiv.style.color = "#a1230c";
+        } else {
+            statusDiv.style.background = "#e6f7ef";
+            statusDiv.style.borderLeftColor = "#10b981";
+            statusDiv.style.color = "#0b5e42";
+        }
+        if (!isLoading && !isError) {
+            setTimeout(() => {
+                if (contract && account && document.getElementById('status').innerHTML.includes(msg)) {
+                    document.getElementById('status').innerHTML = `🔗 Active · ${account.substring(0,5)}...${account.substring(38)}`;
+                    document.getElementById('status').style.background = "#e0f2e9";
+                }
+            }, 2800);
+        }
+    }
+    
+    async function connectWallet() {
+        if (window.ethereum) {
+            try {
+                setStatusMessage("Connecting to MetaMask...", false, true);
+                web3 = new Web3(window.ethereum);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await web3.eth.getAccounts();
+                account = accounts[0];
+                
+                const netId = await web3.eth.net.getId();
+                currentNetworkId = netId;
+                let netName = netId === 1 ? "Ethereum Mainnet" : (netId === 11155111 ? "Sepolia" : (netId === 5 ? "Goerli" : `Chain ID ${netId}`));
+                document.getElementById('extraInfo').innerHTML = `🌐 ${netName} &nbsp;|&nbsp; 🧾 ${contractAddress.substring(0,10)}...`;
+                
+                contract = new web3.eth.Contract(contractABI, contractAddress);
+                document.getElementById('accountInfo').innerHTML = `🟢 ${account.substring(0,6)}...${account.substring(38)}`;
+                document.getElementById('shortContractAddr').innerHTML = contractAddress.substring(0,8)+"..."+contractAddress.substring(36);
+                
+                // validate contract code exists
+                const code = await web3.eth.getCode(contractAddress);
+                if (code === '0x' || code === '0x0') {
+                    setStatusMessage("⚠️ No contract code at this address? Check network", true);
+                } else {
+                    setStatusMessage("Connected! Contract loaded", false);
+                }
+                document.getElementById('status').className = "status connected";
+                await getBalance(true);
+                await updateOwnerBadge();
+                
+                // event listeners
+                window.ethereum.on('accountsChanged', (newAccounts) => {
+                    if (newAccounts.length === 0) {
+                        account = null;
+                        document.getElementById('accountInfo').innerHTML = "⚡ Disconnected";
+                        setStatusMessage("Wallet disconnected", true);
+                        document.getElementById('balance').innerHTML = "0.00 ETH";
+                    } else {
+                        account = newAccounts[0];
+                        document.getElementById('accountInfo').innerHTML = `🟢 ${account.substring(0,6)}...${account.substring(38)}`;
+                        setStatusMessage("Account changed", false);
+                        getBalance(true);
+                        updateOwnerBadge();
+                    }
+                });
+                window.ethereum.on('chainChanged', () => window.location.reload());
+                
+            } catch (error) {
+                console.error(error);
+                setStatusMessage(error.message.includes("rejected") ? "Connection rejected" : "Connection failed", true);
+                document.getElementById('status').className = "status disconnected";
+            }
+        } else {
+            alert("🦊 MetaMask not detected! Please install MetaMask to use this dApp.");
+            setStatusMessage("MetaMask not installed", true);
+        }
+    }
+    
+    async function getBalance(showFeedback = true) {
+        if (!contract) {
+            if(showFeedback) setStatusMessage("Connect wallet first", true);
+            return 0;
+        }
+        try {
+            if(showFeedback) setStatusMessage("Fetching vault balance...", false, true);
+            const balanceWei = await contract.methods.getBalance().call();
+            const balanceEth = web3.utils.fromWei(balanceWei, 'ether');
+            const formatted = parseFloat(balanceEth).toFixed(6);
+            document.getElementById('balance').innerHTML = `${formatted} ETH`;
+            if(showFeedback) setStatusMessage(`Balance: ${formatted} ETH`, false);
+            return balanceEth;
+        } catch (error) {
+            console.error(error);
+            if(showFeedback) setStatusMessage("Couldn't fetch balance (network/contract mismatch)", true);
+            return 0;
+        }
+    }
+    
+    async function deposit() {
+        if (!contract || !account) {
+            setStatusMessage("Connect wallet first", true);
+            return;
+        }
+        let amount = document.getElementById('depositAmount').value;
+        if (!amount || amount <= 0) {
+            setStatusMessage("Enter a valid ETH amount", true);
+            return;
+        }
+        const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+        try {
+            setStatusMessage(`Processing deposit of ${amount} ETH...`, false, true);
+            const tx = await web3.eth.sendTransaction({
+                from: account,
+                to: contractAddress,
+                value: amountWei,
+                gasLimit: 22000
+            });
+            setStatusMessage(`Deposited ${amount} ETH! 🎉`, false);
+            await getBalance(true);
+            document.getElementById('depositAmount').value = '';
+            if (tx.transactionHash && (currentNetworkId === 1 || currentNetworkId === 11155111 || currentNetworkId === 5)) {
+                let explorer = currentNetworkId === 1 ? "https://etherscan.io/tx/" : (currentNetworkId === 11155111 ? "https://sepolia.etherscan.io/tx/" : "https://goerli.etherscan.io/tx/");
+                document.getElementById('extraInfo').innerHTML = `🔗 <a href="${explorer}${tx.transactionHash}" target="_blank" style="color:#2563eb;">View latest tx</a> | ${document.getElementById('extraInfo').innerHTML.split('|')[1] || ''}`;
+            }
+        } catch (error) {
+            let msg = error.message;
+            if (msg.includes("user rejected")) msg = "Transaction rejected";
+            else if (msg.includes("insufficient funds")) msg = "Insufficient ETH balance";
+            setStatusMessage(`Deposit failed: ${msg}`, true);
+        }
+    }
+    
+    async function sendMoney() {
+        if (!contract || !account) {
+            setStatusMessage("Connect wallet first", true);
+            return;
+        }
+        const to = document.getElementById('sendTo').value.trim();
+        const amount = document.getElementById('sendAmount').value;
+        if (!to || !amount || amount <= 0) {
+            setStatusMessage("Valid recipient address and amount required", true);
+            return;
+        }
+        if (!to.startsWith('0x') || to.length !== 42) {
+            setStatusMessage("Address must be 0x... (42 chars)", true);
+            return;
+        }
+        try {
+            setStatusMessage(`Sending ${amount} ETH (owner only)...`, false, true);
+            const amountWei = web3.utils.toWei(amount.toString(), 'ether');
+            const gas = await contract.methods.sendMoney(to, amountWei).estimateGas({ from: account });
+            const tx = await contract.methods.sendMoney(to, amountWei).send({ from: account, gas: Math.floor(gas * 1.1) });
+            setStatusMessage(`Sent ${amount} ETH to ${to.substring(0,8)}...`, false);
+            await getBalance(true);
+            document.getElementById('sendTo').value = '';
+            document.getElementById('sendAmount').value = '';
+            if (tx.transactionHash && (currentNetworkId === 1 || currentNetworkId === 11155111)) {
+                let exp = currentNetworkId === 1 ? "https://etherscan.io/tx/" : "https://sepolia.etherscan.io/tx/";
+                document.getElementById('extraInfo').innerHTML = `🔗 <a href="${exp}${tx.transactionHash}" target="_blank">Tx receipt</a> | ${document.getElementById('extraInfo').innerHTML.split('|')[1] || ''}`;
+            }
+        } catch (error) {
+            let errMsg = error.message;
+            if (errMsg.includes("Not owner") || errMsg.includes("Ownable")) errMsg = "⛔ Only the contract owner can send ETH!";
+            else if (errMsg.includes("Not enough funds")) errMsg = "Contract has insufficient funds";
+            else if (errMsg.includes("execution reverted")) errMsg = "Reverted: check owner status or contract balance";
+            setStatusMessage(errMsg, true);
+        }
+    }
+    
+    async function getOwner() {
+        if (!contract) {
+            setStatusMessage("Connect wallet first", true);
+            return;
+        }
+        try {
+            const ownerAddress = await contract.methods.owner().call();
+            const shortOwner = ownerAddress.substring(0,8) + "..." + ownerAddress.substring(36);
+            const isOwnerNow = (account && account.toLowerCase() === ownerAddress.toLowerCase());
+            let msg = `🏛️ Contract Owner: ${shortOwner}\n\n`;
+            if (isOwnerNow) msg += "✅ You ARE the owner! You can send ETH.";
+            else msg += "🔒 You are not the owner. Only the owner can execute transfers.";
+            alert(msg);
+            setStatusMessage(isOwnerNow ? "You are the owner ✓" : "Owner address fetched", false);
+        } catch (e) {
+            setStatusMessage("Error fetching owner", true);
+        }
+    }
+    
+    async function updateOwnerBadge() {
+        if (!contract || !account) return;
+        try {
+            const ownerAddress = await contract.methods.owner().call();
+            const isOwner = account.toLowerCase() === ownerAddress.toLowerCase();
+            const statusDiv = document.getElementById('status');
+            if (isOwner) {
+                statusDiv.innerHTML = "👑 Owner Mode · Full control over vault";
+                statusDiv.style.background = "#fef9e3";
+                statusDiv.style.borderLeftColor = "#f59e0b";
+                statusDiv.style.color = "#92400e";
+            } else {
+                if (statusDiv.innerHTML.includes("Owner Mode")) {
+                    statusDiv.innerHTML = `🔗 Active · ${account.substring(0,5)}...${account.substring(38)}`;
+                    statusDiv.style.background = "#e0f2e9";
+                }
+            }
+            let extraDiv = document.getElementById('extraInfo');
+            if (isOwner && !extraDiv.innerHTML.includes("👑 OWNER")) {
+                extraDiv.innerHTML = `👑 OWNER ACTIVE | ${extraDiv.innerHTML}`;
+            } else if (!isOwner && extraDiv.innerHTML.includes("👑 OWNER")) {
+                extraDiv.innerHTML = extraDiv.innerHTML.replace("👑 OWNER ACTIVE | ", "");
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    async function displayNetwork() {
+        if (!web3) {
+            alert("Please connect wallet first");
+            return;
+        }
+        try {
+            const netId = await web3.eth.net.getId();
+            let netName = "";
+            if (netId === 1) netName = "Ethereum Mainnet";
+            else if (netId === 11155111) netName = "Sepolia Testnet";
+            else if (netId === 5) netName = "Goerli Testnet";
+            else netName = `Chain ID ${netId}`;
+            const chainId = await web3.eth.getChainId();
+            alert(`🌍 Network: ${netName}\nChain ID: ${chainId}\n\nContract address: ${contractAddress}\nMake sure contract is deployed on this network.`);
+            setStatusMessage(`Network: ${netName}`, false);
+        } catch (err) {
+            alert("Network fetch error");
+        }
+    }
+    
+    function copyContractAddress() {
+        navigator.clipboard.writeText(contractAddress);
+        setStatusMessage("Contract address copied to clipboard", false);
+    }
+    
+    // Auto attempt connection if MetaMask is already unlocked
+    window.addEventListener('load', async () => {
+        document.getElementById('shortContractAddr').innerHTML = contractAddress.substring(0,8)+"..."+contractAddress.substring(36);
+        if (window.ethereum && window.ethereum.selectedAddress) {
+            try {
+                const testWeb3 = new Web3(window.ethereum);
+                const accs = await testWeb3.eth.getAccounts();
+                if (accs.length) await connectWallet();
+            } catch(e) { console.log("auto init skipped"); }
+        }
+    });
+</script>
+</body>
+</html> 
